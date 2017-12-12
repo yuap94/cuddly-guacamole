@@ -51,6 +51,11 @@ def spreading_fcn(d, r, sigma):
     return np.exp(-np.inner(r,r)/(2*sigma**2))/(2*np.pi*sigma**2)**(3/2)
 
 
+def interpolate(phi_L_discrete,...)
+	...
+	return phi_L_continuous
+
+
 
 def PME(system, sigma): 
     '''Particle mesh Ewald summation, computes the long range
@@ -82,6 +87,6 @@ def PME(system, sigma):
 
 	phi_L[m] = IFFT(phi_L_hat)
 
-	system.LRpotential = phi_L
+	system.LRpotential = interpolate(phi_L)
 
     return system
