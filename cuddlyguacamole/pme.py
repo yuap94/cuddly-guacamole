@@ -50,26 +50,26 @@ class Box(object):
 	    self.center = center
 	    self.particles = particles
 
-class Ensemble(object):
-	"""A 1 to 3-dimensional space, containing boxes of charged particles:
+# class Ensemble(object):
+# 	"""A 1 to 3-dimensional space, containing boxes of charged particles:
 
-	Attributes:
-		dimension (int): dimension of the space
-	    extension (float): total size of the (quadratic) space
-	    boxes (numpy array of Box): array of Box objects in the space
-	"""
+# 	Attributes:
+# 		dimension (int): dimension of the space
+# 	    extension (float): total size of the (quadratic) space
+# 	    boxes (numpy array of Box): array of Box objects in the space
+# 	"""
 
-	def __init__(self, dimension, size, box, box_position, no_of_boxes):
-	    """Return an ensemble object whose length(&breadth&height) is *size*,
-	    is centered at *center*, and is divided into the Box objects in the numpy
-	    array *boxes*"""
-	    self.dimension = dimension	  
-	    self.size = size
-	    self.box = box
-	    self.no_of_boxes = no_of_boxes
-	    self.box_position = box_position
-	    self.boxes = np.array[(.....)] # construct the array of boxes in the ensemble using the information about
-	    # the box size and the amount of boxes/position of boxes
+# 	def __init__(self, dimension, size, box, box_position, no_of_boxes):
+# 	    """Return an ensemble object whose length(&breadth&height) is *size*,
+# 	    is centered at *center*, and is divided into the Box objects in the numpy
+# 	    array *boxes*"""
+# 	    self.dimension = dimension	  
+# 	    self.size = size
+# 	    self.box = box
+# 	    self.no_of_boxes = no_of_boxes
+# 	    self.box_position = box_position
+# 	    self.boxes = np.array[(.....)] # construct the array of boxes in the ensemble using the information about
+# 	    # the box size and the amount of boxes/position of boxes
 
 
 def spreading_fcn(d, r, sigma):
