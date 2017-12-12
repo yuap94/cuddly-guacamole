@@ -68,23 +68,17 @@ def PME(system, sigma):
 	
 	# First we compute the LR charge density at the center of each box, using the charges and positions
 	# of the particles in the box
-	M = ensemble.boxes.size
+	M = system.boxes[1].size
 	rho_L = np.zeros(M) #
-	d = ensemble.dimension
+	d = system.dimension
 	L = box.size
 
 	for m in range(0,M):
-		for box in ensemble.boxes:
+		for box in system.boxes:
 			n = box.center
 			for j in range(size(box.particles)):
 				rho_L[m] += box.particles[j].charge*spreading_fcn(d, particles[m].position - particles[j].position + n*L, sigma)  
 
 
-	# r = np.zeros((steps,2))
-    # r[0] = np.random.randn(2)
-
-    # for i in range(steps-1):
-        
-    #     r[i+1] = r[i] + dt/m*p[i] - dt**2/(2*m)*pot_grad(r[i])
 
     return r, p
