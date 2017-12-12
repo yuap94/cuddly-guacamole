@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 
-
+############################################################################
+# Define Particle and Box classes <- move to system module #
+############################################################################
 class Particle(object):
     """A particle. Particles have the following properties:
 
@@ -20,14 +22,6 @@ class Particle(object):
         self.position = position
         self.charge = charge
         self.mass = mass
-
-    # def withdraw(self, amount):
-    #     """Return the balance remaining after withdrawing *amount*
-    #     dollars."""
-    #     if amount > self.balance:
-    #         raise RuntimeError('Amount greater than available balance.')
-    #     self.balance -= amount
-    #     return self.balance
 
 
 class Box(object):
@@ -50,6 +44,7 @@ class Box(object):
 	    self.center = center
 	    self.particles = particles
 
+#############################################################################
 
 def spreading_fcn(d, r, sigma):
     """Return value of d-dimensional gaussian spreading function with std sigma at point r"""
@@ -80,5 +75,13 @@ def PME(system, sigma):
 				rho_L[m] += box.particles[j].charge*spreading_fcn(d, particles[m].position - particles[j].position + n*L, sigma)  
 
 
+	rho_L_hat = FFT(rho_L)
 
-    return r, p
+	for k in range(rho_hat.size):
+		phi_L_hat[k] = rho_L/(epsilon0*k^2)
+
+	phi_L[m] = IFFT(phi_L_hat)
+
+	system.LRpotential = phi_L
+
+    return system
