@@ -50,27 +50,6 @@ class Box(object):
 	    self.center = center
 	    self.particles = particles
 
-# class Ensemble(object):
-# 	"""A 1 to 3-dimensional space, containing boxes of charged particles:
-
-# 	Attributes:
-# 		dimension (int): dimension of the space
-# 	    extension (float): total size of the (quadratic) space
-# 	    boxes (numpy array of Box): array of Box objects in the space
-# 	"""
-
-# 	def __init__(self, dimension, size, box, box_position, no_of_boxes):
-# 	    """Return an ensemble object whose length(&breadth&height) is *size*,
-# 	    is centered at *center*, and is divided into the Box objects in the numpy
-# 	    array *boxes*"""
-# 	    self.dimension = dimension	  
-# 	    self.size = size
-# 	    self.box = box
-# 	    self.no_of_boxes = no_of_boxes
-# 	    self.box_position = box_position
-# 	    self.boxes = np.array[(.....)] # construct the array of boxes in the ensemble using the information about
-# 	    # the box size and the amount of boxes/position of boxes
-
 
 def spreading_fcn(d, r, sigma):
     """Return value of d-dimensional gaussian spreading function with std sigma at point r"""
@@ -78,19 +57,13 @@ def spreading_fcn(d, r, sigma):
 
 
 
-def PME(ensemble, sigma): 
+def PME(system, sigma): 
     '''Particle mesh Ewald summation, computes the long range
     Ewald (coloumb) interaction energy of an ensemble of charged particles.
     
     arguments:
-    	ensemble (object of class Ensemble): attributes of the ensemble includes an its extension in space
-    	an array of box objects, each with attributes extension (giving their size) and center (giving the 
-    	position of the center of the box).
-
-    	The boxes in turn have a numpy array of particles, (i.e. objects of the class Particle).
-        box: a box object, giving the dimensions of the box the particles are in
-        space: a space object, specifying the dimensions of the total space we're considering,
-        how many boxes are in our space and where they are located (their centers and dimensions)
+    	system (array like of Box?): array of boxes  (each with a center, size and array particles of type Particle)
+    	sigma: std of the gaussian spreading functions...
     '''
 	
 	# First we compute the LR charge density at the center of each box, using the charges and positions
