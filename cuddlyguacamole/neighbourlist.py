@@ -3,12 +3,12 @@ import numpy as np
 
 
 def enforce_pbc(r_vec, boxsize):
-    for i, length in enumerate(boxsize):
-        while r_vec[i] >= 0.5 * length:
-            r_vec[i] -= length
-        while r_vec[i] < -0.5 * length:
-            r_vec[i] += length
-    return r_vec
+	for i, length in enumerate(boxsize):
+		while r_vec[i] >= 0.5 * length:
+			r_vec[i] -= length
+		while r_vec[i] < -0.5 * length:
+			r_vec[i] += length
+	return r_vec
 
 def verlet_neighbourlist(box, r_cut, r_skin):
 	"""Verlet neighbourlist computation: for each of the particles in the array *particles*,
