@@ -71,10 +71,8 @@ def mcmc(box, n_steps, width=0.2, n_skip=1, n_reuse_nblist = 1,
             potLJ_history.append([potLJ_curr])
 
     for i, particlei in enumerate(box.particles): # update to final system config before returning box
-        particlei.position = pos_curr[i] # or box.particles[i].position = pos_curr[i] ??? how do pointers work exactly in python?
+        particlei.position = pos_curr[i] # or box.particles[i].position = pos_curr[i] ?
 
-    # update properties of box object before returning:
-    # !!!!!!!!!!!!!
     return box, positions_history, potLJ_history
 
 
