@@ -12,7 +12,7 @@ def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
     q = (sigmaij / r)**6
     q_c = (sigmaij/r_cut)**6
     return (4.0 * epsilonij * q * (q - 1.0) 
-    	   - 4.0 * epsilonij * q_c *(q_c - 1.0)) # subtract value of potential at r_cut to avoid discontinuity
+    	   - 4.0 * epsilonij * q_c *(q_c - 1.0)) # subtract value of potential at r_cut to avoid discontinuity # precompute!!!!!!
 
 
 def enforce_pbc(r_vec, boxsize):
