@@ -24,7 +24,7 @@ def verlet_neighbourlist(box, r_cut, r_skin):
 		particlei.neighbourlist = [] # clear neighbourlist for each particle		
 		for particlej in box.particles[i+1:]:
 			if np.linalg.norm(enforce_pbc(particlei.position - particlej.position,box.size)) < r_cut + r_skin
-				particlei.neighbourlist.append(particlej)
+				particlei.neighbourlist.append(particlej) #this updates box.particles[i].neighbourlist as well?
 				particlej.neighbourlist.append(particlei)
 
 	return box

@@ -1,28 +1,29 @@
 import numpy as np
 import lennardjones
-import energy
+import neighbourlist
+#import energy # for coloumb energy
+#import system?
 
-def mcmc_step(positions_curr, box, potLJ_curr=None, width=0.2, temp = 273.15, update_nblist=True):
+def mcmc_step(box, width=0.2, temp = 273.15, update_nblist=True):
 
     kb = 1.38064852*10**(-23) # boltzmann constant
 
-    if pot_LJ_curr is None:
-        pot_LJ_curr = LJ_potential(box = box)
+    if box.positions is None:
+        box.make_positions_list()
+    positions_curr = box.positions
+
+    if box.LJpotential is None:
+        box.compute_LJ_potential()
+    pot_LJ_curr = box.LJpotential
 
     if update_nblist:
-        ####
-        ###############
-        ##########
-        #TO DO!!!!!!!!!
-        ##############
-        ###############
-        ##########
+        box.neighourlist = neighbourlist.verlet_neighbourlist(box, r_c, r_skin) #fix r_c&r_skin
 
     positions_trial = (positions_curr + width * 
                       np.random.randn(*np.asarray(positions_curr).shape)/4) #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5,0.5)
-    potLJ_trial = LJ_potential(positions = positions_trial, boxsize = box.size)
+    potLJ_trial = lennardjones.LJ_potential(box)
 
-    if np.random.rand() < min(1,np.exp(-(potLJ_trial - potLJ_curr)/kb*box.temp)):
+    if np.random.rand() < min(1,np.exp(-(potLJ_trial - potLJ_curr)/(kb*box.temp))):
         return positions_trial, potLJ_trial
     return positions_curr, potLJ_curr
 
@@ -42,13 +43,13 @@ def mcmc(box, n_steps, width=0.2, n_skip=1, n_reuse_nblist = 1,
     '''
 
     # Store initial position for each particle in list
-    positions_initial = [] 
-    for particle in box.particles:
-        positions_initial.append(particle.position)
-    # positions_initial = box.positions #<----  fix  
+    #positions_initial = [] 
+    #for particle in box.particles:
+    #    positions_initial.append(particle.position)
+    positions_initial = box.positions
 
     # Store initial total LJ potential:
-    potLJ_initial = LJ_potential(box, r_c, r_s) 
+    potLJ_initial = lennardjones.LJ_potential(box, r_c, r_s) 
 
     # Save intial system configuration (positions & potential):
     if save_system_history:
@@ -72,6 +73,8 @@ def mcmc(box, n_steps, width=0.2, n_skip=1, n_reuse_nblist = 1,
     for i, particlei in enumerate(box.particles): # update to final system config before returning box
         particlei.position = pos_curr[i] # or box.particles[i].position = pos_curr[i] ??? how do pointers work exactly in python?
 
+    # update properties of box object before returning:
+    # !!!!!!!!!!!!!
     return box, positions_history, potLJ_history
 
 
