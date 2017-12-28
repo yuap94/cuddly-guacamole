@@ -44,14 +44,14 @@ class Box(object):
 	    		in space that the box covers (automatically computed from the center and the size of the box?)
 	    LJpotential (float): Lennard Jones Potential of the system (calculated based on the positions of the particles in *particles*)
 	    temp (float): temperature in the box
-	    LJneighbourlist (list of numpy arrays of int): a list with of same size as *particles*,
+	    ????LJneighbourlist (list of numpy arrays of int): a list with of same size as *particles*,
 	    											 with a numpy array of int for each particle listing the indices of the 
 	    											 neighbouring particles (particles within the LJ cutoff radius)
 		r_c_LJ (float): cutoff radius for LJ potential calculation
 		r_skin_LJ (float): size of skin region for LJ potential calculation 
 	"""
 
-	def __init__(self, dimension, size, center, particles, temp=273.15, LJneighbourlist = []):
+	def __init__(self, dimension, size, center, particles, temp=273.15):
 	    """Return a Box object of dimension *dimension* (between 1 and 3),
 	    whose length(&breadth&height) is *size*, is centered at *center*, 
 	    and contains the particles in the numpy array *particles*"""
@@ -64,21 +64,22 @@ class Box(object):
 	    self.LJpotential = None
 	    self.positions = None
 	    self.temp = temp
-	    self.LJneighbourlist = LJneighbourlist
+	    #self.LJneighbourlist = None
 
-	@LJneighbourlist.setter    # why use decorator??
-    def compute_LJneighbourlist(self, r_cut, r_skin):
-    	self.LJneighbourlist = neighbourlist.LJneighbourlist(self, r_cut, r_skin)
+	#@LJneighbourlist.setter    # why use decorator??
+	#def compute_LJneighbourlist(self, r_cut, r_skin):
+	#	self.LJneighbourlist = neighbourlist.LJneighbourlist(self, r_cut, r_skin)
 
-	@LJpotential.setter    # why use decorator??
-    def compute_LJ_potential(self, r_cut, r_skin):
-    	self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
 
-	@positions.setter # why use decorator??
+	#@LJpotential.setter    # why use decorator??
+	def compute_LJ_potential(self, r_cut, r_skin):
+		self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
+
+	#@positions.setter # why use decorator??
 	def make_positions_list(self):
 		self.positions = [] # store initial position for each particle in list
-    	for particle in self.particles:
-        	self.positions.append(particle.position)
+		for particle in self.particles:
+			self.positions.append(particle.position)
 
 
 
