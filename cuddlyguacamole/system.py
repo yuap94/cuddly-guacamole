@@ -55,6 +55,7 @@ class Box(object):
 	    """Return a Box object of dimension *dimension* (between 1 and 3),
 	    whose length(&breadth&height) is *size*, is centered at *center*, 
 	    and contains the particles in the numpy array *particles*"""
+        
 	    self.dimension = dimension
 	    self.size = size
 	    self.center = center
