@@ -26,7 +26,7 @@ class Particle(object):
         self.charge = charge
         self.sigmaLJ = sigmaLJ
         self.epsilonLJ = epsilonLJ
-        self.neighbourlist = neighbourlist
+        self.neighbourlist = None
 
 
 class Box(object):
@@ -51,7 +51,7 @@ class Box(object):
 		r_skin_LJ (float): size of skin region for LJ potential calculation 
 	"""
 
-	def __init__(self, dimension, size, center, particles, temp=273.15, LJneighbourlist = [], r_c_LJ, r_skin_LJ):
+	def __init__(self, dimension, size, center, particles, temp=273.15, LJneighbourlist = []):
 	    """Return a Box object of dimension *dimension* (between 1 and 3),
 	    whose length(&breadth&height) is *size*, is centered at *center*, 
 	    and contains the particles in the numpy array *particles*"""
@@ -64,16 +64,14 @@ class Box(object):
 	    self.positions = None
 	    self.temp = temp
 	    self.LJneighbourlist = LJneighbourlist
-	    self.r_c_LJ = r_c_LJ
-	    self.r_skin_LJ = r_skin_LJ
 
 	@LJneighbourlist.setter    # why use decorator??
-    def compute_LJneighbourlist(self):
-    	self.LJneighbourlist = neighbourlist.LJneighbourlist(self, self.r_c_LJ, self.r_s_LJ)
+    def compute_LJneighbourlist(self, r_cut, r_skin):
+    	self.LJneighbourlist = neighbourlist.LJneighbourlist(self, r_cut, r_skin)
 
 	@LJpotential.setter    # why use decorator??
-    def compute_LJ_potential(self):
-    	self.LJpotential = lennardjones.LJ_potential(self, self.r_c_LJ, self.r_s_LJ)
+    def compute_LJ_potential(self, r_cut, r_skin):
+    	self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
 
 	@positions.setter # why use decorator??
 	def make_positions_list(self):
