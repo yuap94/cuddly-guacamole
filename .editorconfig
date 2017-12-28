@@ -1,4 +1,5 @@
 # EditorConfig is awesome: http://EditorConfig.org
 
+[*.{py,txt,editorconfig}]
 indent_style = space
 indent_size = 4
