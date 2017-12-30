@@ -4,7 +4,7 @@ import neighbourlist
 #import energy # for coloumb energy
 #import system?
 
-def mcmc_step(box, width=1.0, r_cut, r_skin, update_nblist=True):
+def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
     kb = 1.38064852*10**(-23) # boltzmann constant
 
@@ -13,17 +13,18 @@ def mcmc_step(box, width=1.0, r_cut, r_skin, update_nblist=True):
                         #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
     if update_nblist:
         box.neighourlist = neighbourlist.verlet_neighbourlist(box, r_cut, r_skin)
-        box_trial.neighourlist = neighbourlist.verlet_neighbourlist(box_trial, r_cut, r_skin) # fix? necessary to also compute nblist for trial box?
+        box_trial.neighourlist = neighbourlist.verlet_neighbourlist(box_trial, r_cut, r_skin) # fix? indeed necessary to also compute nblist for trial box?
     
-    box_trial.LJpotential = lennardjones.LJ_potential(box_trial, r_cut, r_skin) #FIX? should update box_trial.particles[i].position/LJpotential as well for all i in each step? or just do at very end of mcmc function?
+    box_trial.LJpotential = lennardjones.LJ_potential(box_trial, r_cut, r_skin) 
 
     if np.random.rand() < min(1, np.exp(-(box_trial.LJpotential - box.LJpotential)/(kb*box.temp))):
-        return box.trial
+        # print("hi")
+        return box_trial
     return box
 
 
-def mcmc(box, n_steps, width, n_skip=1, n_reuse_nblist = 1, 
-            save_system_history = False, r_cut_LJ, r_skin_LJ):
+def mcmc(box, n_steps, width, n_skip, n_reuse_nblist, 
+            save_system_history, r_cut_LJ, r_skin_LJ):
     '''Metropolis MCMC simulation of the movement of the particles within *box*.
     NB: Currently only using LJ potential. Returns the box object with new system configuration
     and a system configuration history.
@@ -46,7 +47,7 @@ def mcmc(box, n_steps, width, n_skip=1, n_reuse_nblist = 1,
 
     # Store initial total LJ potential:
     if box.LJpotential is None:
-        box.compute_LJ_potential()
+        box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 
     # Save intial system configuration (positions & potential):
     positions_history = [box.positions] 
@@ -54,14 +55,18 @@ def mcmc(box, n_steps, width, n_skip=1, n_reuse_nblist = 1,
  
     for i in range(int(n_steps/n_skip)): # fix?!!!
         for j in range(n_skip):
-            if mod(i+j, n_reuse_nblist) == 0:
-                box = mcmc_step(box, width, r_cut, r_skin, True)
+            if np.mod(i+j, n_reuse_nblist) == 0:
+                box = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, True)
+                for k in range(len(box.particles)): #update position for each particle object in box
+                    box.particles[k].position = box.positions[k]
             else:
-                box = mcmc_step(box, width, r_cut, r_skin, False)
+                box = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, False)
+                for k in range(len(box.particles)): #update position for each particle object in box
+                    box.particles[k].position = box.positions[k]
 
         if save_system_history:
-            positions_history.append([box.positions])
-            potLJ_history.append([box.LJpotential])
+            positions_history.append(box.positions)
+            potLJ_history.append(box.LJpotential)
 
     for i in range(len(box.particles)): #update position for each particle object in box before returning box
         box.particles[i].position = box.positions[i]

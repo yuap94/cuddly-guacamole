@@ -64,18 +64,13 @@ class Box(object):
 	    self.LJpotential = None
 	    self.positions = None
 	    self.temp = temp
-	    #self.LJneighbourlist = None
 
-	#@LJneighbourlist.setter    # why use decorator??
-	#def compute_LJneighbourlist(self, r_cut, r_skin):
-	#	self.LJneighbourlist = neighbourlist.LJneighbourlist(self, r_cut, r_skin)
+	def compute_LJneighbourlist(self, r_cut, r_skin):
+		self = neighbourlist.verlet_neighbourlist(self, r_cut, r_skin)
 
-
-	#@LJpotential.setter    # why use decorator??
 	def compute_LJ_potential(self, r_cut, r_skin):
 		self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
 
-	#@positions.setter # why use decorator??
 	def make_positions_list(self):
 		self.positions = [] # store initial position for each particle in list
 		for particle in self.particles:
