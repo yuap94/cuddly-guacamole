@@ -39,7 +39,7 @@ width = 1.0
 n_skip = int(n_steps/100)
 n_reuse_nblist = int(n_steps/50)
 save_system_history = True
-r_cut_LJ = 2.5 * 0.04 
+r_cut_LJ = 2.5 * sigma_argon
 r_skin_LJ = 2*n_reuse_nblist*width
 ourbox, pos_history, pot_history = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
 
