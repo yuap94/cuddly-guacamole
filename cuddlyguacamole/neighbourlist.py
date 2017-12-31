@@ -1,14 +1,5 @@
 import numpy as np
-#import system?
-
-
-def enforce_pbc(r_vec, boxsize):
-	for i, length in enumerate(boxsize):
-		while r_vec[i] >= 0.5 * length:
-			r_vec[i] -= length
-		while r_vec[i] < -0.5 * length:
-			r_vec[i] += length
-	return r_vec
+import system
 
 def verlet_neighbourlist(box, r_cut, r_skin):
 	"""Verlet neighbourlist computation: for each of the particles in the array *box.particles*,
@@ -27,7 +18,7 @@ def verlet_neighbourlist(box, r_cut, r_skin):
 
 	for i, particlei in enumerate(box.particles):		
 		for j, particlej in enumerate(box.particles[i+1:]):
-			if np.linalg.norm(enforce_pbc(particlei.position - particlej.position, box.size)) < r_cut + r_skin:
+			if np.linalg.norm(system.enforce_pbc(particlei.position - particlej.position, box.size)) < r_cut + r_skin:
 				box.particles[i].neighbourlist.append(particlej)
 				box.particles[j+i+1].neighbourlist.append(particlei)
 

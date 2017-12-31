@@ -1,7 +1,6 @@
 import numpy as np
 import neighbourlist
-#import system?
-
+import system
 
 def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
     
@@ -34,7 +33,7 @@ def LJ_potential(box, r_c, r_s):
     for particlei in box.particles:
         LJpot_i = 0.0
         for particlej in particlei.neighbourlist:
-            r = np.linalg.norm(neighbourlist.enforce_pbc(particlei.position - particlej.position, box.size))
+            r = np.linalg.norm(system.enforce_pbc(particlei.position - particlej.position, box.size))
             LJpot_i += LJ_potential_ij(r, particlei.sigmaLJ, particlei.epsilonLJ, 
         								particlej.sigmaLJ, particlej.epsilonLJ, r_c, r_s)
         LJpot += LJpot_i

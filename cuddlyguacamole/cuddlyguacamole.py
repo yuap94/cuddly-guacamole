@@ -3,6 +3,7 @@ import csv
 import system
 import input.inputgenerator
 import metropolis
+import neighbourlist
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -17,10 +18,15 @@ fid_reader = csv.reader(fid, delimiter=',', quoting=csv.QUOTE_NONNUMERIC)
 for row in fid_reader:
 	sysconfig.append(row)
 
+dim = 3
+boxsize = np.ones(dim)
+for i in range(len(sysconfig)):
+	sysconfig[i][0:3] = system.enforce_pbc(sysconfig[i][0:3], boxsize)
+
+
 particles = []
 
-# xenon: http://www.chegg.com/homework-help/questions-and-answers/2-values-lennard-jones-potential-xenon-found-177-kj-mol-410-respectively-values-lennard-jo-q14503605
-# argon: http://pbx-brasil.com/outrasDisciplinas/DinMol/Notas/IIarea/aula203/papers/PhysRev.159.98.pdf
+# xenon & argon: http://pbx-brasil.com/outrasDisciplinas/DinMol/Notas/IIarea/aula203/papers/PhysRev.159.98.pdf
 kb = 1.38064852*10**(-23) # boltzmann constant
 sigma_argon = 3.405 # Å
 epsilon_argon = 119.8 * kb * 10**(10) # N*Å
@@ -29,8 +35,7 @@ for i in range(len(sysconfig)):
 	particles.append(system.Particle(position = np.asarray(sysconfig[i][0:3]), 
 		charge = sysconfig[i][3], sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon))
 
-ourbox = system.Box(dimension = 3, size = np.array([1.0, 1.0, 1.0]), center = np.array([0.0, 0.0, 0.0]), 
-					particles = particles, temp = 120.0)
+ourbox = system.Box(dimension = dim, size = boxsize, particles = particles, temp = 120.0)
 
 
 width = sigma_argon / 10
@@ -45,10 +50,10 @@ ourbox, pos_history, pot_history = metropolis.mcmc(ourbox, n_steps, width, n_ski
 
 # print(ourbox.LJpotential)
 
-# for i, pot in enumerate(pot_history):
-# 	print(i)
-# 	# print(pos)
-# 	print(pot)
+for i, pos in enumerate(pos_history):
+	print(i)
+	print(pos)
+	# print(pot)
 
 
 xyz = np.zeros((len(pos_history),3))

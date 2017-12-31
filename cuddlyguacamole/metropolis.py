@@ -2,7 +2,7 @@ import numpy as np
 import lennardjones
 import neighbourlist
 #import energy # for coloumb energy
-#import system?
+import system
 
 def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
@@ -10,6 +10,8 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
     box_trial = box
     box_trial.positions = box_trial.positions + width * np.random.randn(*np.asarray(box_trial.positions).shape)/4
+    for i in range(len(box_trial.positions)):
+        box_trial.positions[i] = system.enforce_pbc(box_trial.positions[i], box_trial.size)
                         #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
     if update_nblist:
         box.neighourlist = neighbourlist.verlet_neighbourlist(box, r_cut, r_skin)

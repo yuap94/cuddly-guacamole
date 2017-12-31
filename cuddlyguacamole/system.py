@@ -35,9 +35,8 @@ class Box(object):
 	Attributes:
 		dimension (int): dimension of the box (1-3)
 	    size (*dimension*-dimensional numpy array of float): 1d-3d numpy array giving size of the box in each direction
-	    center (*dimension*-dimensional numpy array of loat): 1d-3d numpy array locating the center of the box
-	    particles (*dimension*-dimensional numpy array of Particle): 1d-3d numpy array of particles in the box (particle objects 
-	    		have charge, position and possibly mass)
+	    center (*dimension*-dimensional numpy array of loat): 1d-3d numpy array locating the center of the box (always the origin)
+	    particles (list of Particle): list of particles in the box
 	    positions (python list of *dimension*-dimensional numpy arrays with the position of all the particles, for ease of use... only
 	    		create if needed using a set method? and always store if created?)
 	    		region (*dimension*x2-dimensional numpy array of float): specifies the region
@@ -51,16 +50,15 @@ class Box(object):
 		r_skin_LJ (float): size of skin region for LJ potential calculation 
 	"""
 
-	def __init__(self, dimension, size, center, particles, temp=273.15):
+	def __init__(self, dimension, size, particles, temp=273.15):
 	    """Return a Box object of dimension *dimension* (between 1 and 3),
 	    whose length(&breadth&height) is *size*, is centered at *center*, 
 	    and contains the particles in the numpy array *particles*"""
         
 	    self.dimension = dimension
 	    self.size = size
-	    self.center = center
+	    self.center = np.zeros(dimension)
 	    self.particles = particles
-	    self.region = np.transpose(np.array([center-size/2, center + size/2]))
 	    self.LJpotential = None
 	    self.positions = None
 	    self.temp = temp
@@ -79,3 +77,22 @@ class Box(object):
 
 
 #############################################################################
+
+
+# Implementation of periodic boundary conditions:
+
+def enforce_pbc(r_vec, boxsize):
+	for i, length in enumerate(boxsize):
+		while r_vec[i] >= 0.5 * length:
+			r_vec[i] -= length
+		while r_vec[i] < -0.5 * length:
+			r_vec[i] += length
+	return r_vec
+
+
+
+
+
+
+
+
