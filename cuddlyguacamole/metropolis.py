@@ -3,26 +3,38 @@ import lennardjones
 import neighbourlist
 #import energy # for coloumb energy
 import system
+import numpy.testing as npt
+import copy
+import warnings
+
 
 def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
-    kb = 1.38064852*10**(-23) # boltzmann constant
+    # kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
 
-    box_trial = box
-    box_trial.positions = box_trial.positions + width * np.random.randn(*np.asarray(box_trial.positions).shape)/4
-    for i in range(len(box_trial.positions)):
-        box_trial.positions[i] = system.enforce_pbc(box_trial.positions[i], box_trial.size)
-                        #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
+    box_trial = copy.deepcopy(box)
+    trial_step = width * np.random.randn(*np.asarray(box_trial.positions).shape)/4 #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
+
+    for i, particle in enumerate(box_trial.particles):
+        box_trial.particles[i].position = system.enforce_pbc(box_trial.particles[i].position + trial_step[i], box_trial.size) 
+        # print(box_trial.particles[0].position)
+
+    box_trial.make_positions_list()
+    box_trial.compute_LJ_potential(r_cut, r_skin)
     if update_nblist:
-        box.neighourlist = neighbourlist.verlet_neighbourlist(box, r_cut, r_skin)
-        box_trial.neighourlist = neighbourlist.verlet_neighbourlist(box_trial, r_cut, r_skin) # fix? indeed necessary to also compute nblist for trial box?
-    
-    box_trial.LJpotential = lennardjones.LJ_potential(box_trial, r_cut, r_skin) 
+        box_trial.compute_LJneighbourlist(r_cut, r_skin) 
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        acceptance_prob = min(1.0, np.exp(-(box_trial.LJpotential - box.LJpotential)/box.temp)) # note: potential is actually potential/kb
 
-    if np.random.rand() < min(1, np.exp(-(box_trial.LJpotential - box.LJpotential)/(kb*box.temp))):
-        # print("hi")
-        return box_trial
-    return box
+    # if (box_trial.LJpotential>box.LJpotential):
+    #     print("increase = " + repr(box_trial.LJpotential-box.LJpotential))
+    #     print("acceptance prob. = " + repr(acceptance_prob))
+
+    # print(acceptance_prob)
+    if np.random.rand() < acceptance_prob:
+        return box_trial, trial_step, acceptance_prob # return trial_step and acceptance_prob to use in unit testing
+    return box, trial_step, acceptance_prob
 
 
 def mcmc(box, n_steps, width, n_skip, n_reuse_nblist, 
@@ -40,40 +52,32 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist,
                                 verlet neighbourlist of the particles in *box*
         save_system_history (bool): save the history of system states during the mcmc simulation? 
         r_cut_LJ (float): cut-off radius for LJ neighbourlist computation
-        r_sking_LJ (float): size of skin-reigon for LJ neighbourlist computation
+        r_skin_LJ (float): size of skin-reigon for LJ neighbourlist computation
     '''
-
     # Store initial position for each particle in list
-    if box.positions is None:
-        box.make_positions_list()
-
-    # Store initial total LJ potential:
+    positions_history = [box.positions]             
+    # (Compute then) Store initial total LJ potential:
     if box.LJpotential is None:
         box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
+    potLJ_history = [box.LJpotential]  
 
-    # Save intial system configuration (positions & potential):
-    positions_history = [box.positions] 
-    potLJ_history = [box.LJpotential] 
- 
-    for i in range(int(n_steps/n_skip)): # fix?!!!
+    p_acc_vec = []
+    for i in range(int(np.ceil(n_steps/n_skip))):
         for j in range(n_skip):
-            if np.mod(i+j, n_reuse_nblist) == 0:
-                box = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, True)
-                for k in range(len(box.particles)): #update position for each particle object in box
-                    box.particles[k].position = box.positions[k]
+            # box_old = copy.deepcopy(box)
+            if np.mod(i*n_skip+j, n_reuse_nblist+1) == 0:
+                box, _, p_acc = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, True) # mcmc acceptance prob p_acc used in testing
             else:
-                box = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, False)
-                for k in range(len(box.particles)): #update position for each particle object in box
-                    box.particles[k].position = box.positions[k]
-
+                box, _, p_acc = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, False)
+        # if (box.LJpotential>box_old.LJpotential):
+        #     print("increase = " + repr(box.LJpotential-box_old.LJpotential))
+        #     print("acceptance prob. = " + repr(p_acc))
         if save_system_history:
             positions_history.append(box.positions)
             potLJ_history.append(box.LJpotential)
+            p_acc_vec.append(p_acc)
 
-    for i in range(len(box.particles)): #update position for each particle object in box before returning box
-        box.particles[i].position = box.positions[i]
-
-    return box, positions_history, potLJ_history
+    return box, positions_history, potLJ_history, p_acc_vec # return p_acc_vec for use in testing
 
 
 

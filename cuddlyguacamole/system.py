@@ -1,6 +1,7 @@
 import numpy as np
 import lennardjones
 import neighbourlist
+import copy
 
 
 ############################################################################
@@ -30,50 +31,52 @@ class Particle(object):
 
 
 class Box(object):
-	"""A 1 to 3-dimensional square box in space, containing charged particles:
+    """A 1 to 3-dimensional square box in space, containing charged particles:
 
-	Attributes:
-		dimension (int): dimension of the box (1-3)
-	    size (*dimension*-dimensional numpy array of float): 1d-3d numpy array giving size of the box in each direction
-	    center (*dimension*-dimensional numpy array of loat): 1d-3d numpy array locating the center of the box (always the origin)
-	    particles (list of Particle): list of particles in the box
-	    positions (python list of *dimension*-dimensional numpy arrays with the position of all the particles, for ease of use... only
-	    		create if needed using a set method? and always store if created?)
-	    		region (*dimension*x2-dimensional numpy array of float): specifies the region
-	    		in space that the box covers (automatically computed from the center and the size of the box?)
-	    LJpotential (float): Lennard Jones Potential of the system (calculated based on the positions of the particles in *particles*)
-	    temp (float): temperature in the box
-	    ????LJneighbourlist (list of numpy arrays of int): a list with of same size as *particles*,
-	    											 with a numpy array of int for each particle listing the indices of the 
-	    											 neighbouring particles (particles within the LJ cutoff radius)
-		r_c_LJ (float): cutoff radius for LJ potential calculation
-		r_skin_LJ (float): size of skin region for LJ potential calculation 
-	"""
+    Attributes:
+        dimension (int): dimension of the box (1-3)
+        size (*dimension*-dimensional numpy array of float): 1d-3d numpy array giving size of the box in each direction
+        center (*dimension*-dimensional numpy array of loat): 1d-3d numpy array locating the center of the box (always the origin)
+        particles (list of Particle): list of particles in the box
+        positions (python list of *dimension*-dimensional numpy arrays with the position of all the particles, for ease of use... only
+                create if needed using a set method? and always store if created?)
+                region (*dimension*x2-dimensional numpy array of float): specifies the region
+                in space that the box covers (automatically computed from the center and the size of the box?)
+        LJpotential (float): Lennard Jones Potential of the system (calculated based on the positions of the particles in *particles*)
+        temp (float): temperature in the box
+        ????LJneighbourlist (list of numpy arrays of int): a list with of same size as *particles*,
+                                                     with a numpy array of int for each particle listing the indices of the 
+                                                     neighbouring particles (particles within the LJ cutoff radius)
+        r_c_LJ (float): cutoff radius for LJ potential calculation
+        r_skin_LJ (float): size of skin region for LJ potential calculation 
+    """
 
-	def __init__(self, dimension, size, particles, temp=273.15):
-	    """Return a Box object of dimension *dimension* (between 1 and 3),
-	    whose length(&breadth&height) is *size*, is centered at *center*, 
-	    and contains the particles in the numpy array *particles*"""
+    def __init__(self, dimension, size, particles, temp):
+        """Return a Box object of dimension *dimension* (between 1 and 3),
+        whose length(&breadth&height) is *size*, is centered at *center*, 
+        and contains the particles in the numpy array *particles*"""
         
-	    self.dimension = dimension
-	    self.size = size
-	    self.center = np.zeros(dimension)
-	    self.particles = particles
-	    self.LJpotential = None
-	    self.positions = None
-	    self.temp = temp
+        self.dimension = dimension
+        self.size = size
+        self.center = np.zeros(dimension)
+        self.particles = particles
+        self.LJpotential = None
+        self.temp = temp
 
-	def compute_LJneighbourlist(self, r_cut, r_skin):
-		self = neighbourlist.verlet_neighbourlist(self, r_cut, r_skin)
+        for particle in particles:
+            particle.position = enforce_pbc(particle.position, size)
+        self.make_positions_list()
 
-	def compute_LJ_potential(self, r_cut, r_skin):
-		self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
+    def compute_LJneighbourlist(self, r_cut, r_skin):
+        self.particles = neighbourlist.verlet_neighbourlist(self.particles, r_cut, r_skin)
 
-	def make_positions_list(self):
-		self.positions = [] # store initial position for each particle in list
-		for particle in self.particles:
-			self.positions.append(particle.position)
+    def compute_LJ_potential(self, r_cut, r_skin):
+        self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
 
+    def make_positions_list(self):
+        self.positions = [] # update list of positions for each particle
+        for particle in self.particles:
+            self.positions.append(particle.position)
 
 
 #############################################################################
@@ -82,12 +85,12 @@ class Box(object):
 # Implementation of periodic boundary conditions:
 
 def enforce_pbc(r_vec, boxsize):
-	for i, length in enumerate(boxsize):
-		while r_vec[i] >= 0.5 * length:
-			r_vec[i] -= length
-		while r_vec[i] < -0.5 * length:
-			r_vec[i] += length
-	return r_vec
+    for i, length in enumerate(boxsize):
+        while r_vec[i] >= 0.5 * length:
+            r_vec[i] -= length
+        while r_vec[i] < -0.5 * length:
+            r_vec[i] += length
+    return r_vec
 
 
 
