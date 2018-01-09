@@ -6,7 +6,7 @@ class PyTest(TestCommand):
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
     def initialize_options(self):
         TestCommand.initialize_options(self)
-        self.pytest_args = ['urbanbroccoli']
+        self.pytest_args = ['cuddlyguacamole/run_tests.py']
     def run_tests(self):
         import pytest
         errno = pytest.main(self.pytest_args)
