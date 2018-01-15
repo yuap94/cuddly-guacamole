@@ -2,7 +2,8 @@ import numpy as np
 import lennardjones
 import neighbourlist
 import copy
-
+import pbc
+import metropolis
 
 ############################################################################
 # Define Particle and Box classes 
@@ -62,9 +63,12 @@ class Box(object):
         self.particles = particles
         self.LJpotential = None
         self.temp = temp
+        self.Cpotential = None
+        self.pos_history = None
+        self.pot_history = None
 
         for particle in particles:
-            particle.position = enforce_pbc(particle.position, size)
+            particle.position = pbc.enforce_pbc(particle.position, size)
         self.make_positions_list()
 
     def compute_LJneighbourlist(self, r_cut, r_skin):
@@ -79,23 +83,31 @@ class Box(object):
             self.positions.append(particle.position)
 
 
+    def compute_energy(self, r_cutLJ, r_skinLJ, r_cutCo, r_skinCo):
+        self.compute_LJ_potential(r_cutLJ, r_skinLJ)
+
+    def compute_Coloumb_potential(self, r_cutCo, r_rkin_Co):
+        self.Cpotential = 0
+
+    def simulate(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
+        new_box, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+        self = copy.deepcopy(new_box) # fix metropolis.mcmc to return just updated positions instead? <- would require changing LJ functions too...
+
+    def optimize(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co, r_skin_Co):
+        print("code goes here")
+
+
 #############################################################################
 
 
-# Implementation of periodic boundary conditions:
+# # Implementation of periodic boundary conditions:
 
-def enforce_pbc(r_vec, boxsize):
-    for i, length in enumerate(boxsize):
-        while r_vec[i] >= 0.5 * length:
-            r_vec[i] -= length
-        while r_vec[i] < -0.5 * length:
-            r_vec[i] += length
-    return r_vec
-
-
-
-
-
-
+# def enforce_pbc(r_vec, boxsize):
+#     for i, length in enumerate(boxsize):
+#         while r_vec[i] >= 0.5 * length:
+#             r_vec[i] -= length
+#         while r_vec[i] < -0.5 * length:
+#             r_vec[i] += length
+#     return r_vec
 
 

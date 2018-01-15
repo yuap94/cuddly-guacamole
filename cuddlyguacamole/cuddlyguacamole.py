@@ -8,9 +8,10 @@ import lennardjones
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import time
+import pbc
+
 
 start = time.time()
-
 
 ############################################################################################################
 # System and simulation setup:
@@ -27,7 +28,7 @@ dim = 3 # spatial dimension of system
 boxsize = np.ones(dim)*sigma_argon*10 # size of our system box
 
 r_cut_LJ = 2.5*sigma_argon # cut-off radius for LJ potential computation
-n_steps = 2000 # no. of steps to simulate
+n_steps = 1000 # no. of steps to simulate
 n_reuse_nblist = int(n_steps/50) # update the neighbourlist for each particle only every n_reuse_nblist steps
 n_skip = int(n_steps/200) # only save the system history every n_skip steps
 width = r_cut_LJ / (n_reuse_nblist*20)
@@ -50,11 +51,11 @@ for row in fid_reader:
     sysconfig.append(row)
 
 for i in range(len(sysconfig)):
-    sysconfig[i][0:3] = system.enforce_pbc(sysconfig[i][0:3]*boxsize, boxsize)
+    sysconfig[i][0:3] = pbc.enforce_pbc(sysconfig[i][0:3]*boxsize, boxsize)
 
 
 ############################################################################################################
-# Initialise particle list based on input and the system (box):
+# Initialise particle list based on input and the system (ourbox):
 ############################################################################################################
 
 particles = []
@@ -72,9 +73,12 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 ############################################################################################################
 
 save_system_history = True
-ourbox, pos_history, pot_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+# ourbox, pos_history, pot_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+ourbox.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 
 # print(ourbox.LJpotential)
+pos_history = ourbox.pos_history
+pot_history = ourbox.pot_history
 pot_increases = 0
 pot_decreases = 0
 for i, pot in enumerate(pot_history[1:]):
@@ -117,7 +121,7 @@ ax_pot = fig.add_subplot(223)
 ax_pot_late = fig.add_subplot(224)
 
 ax_pot.plot(np.asarray(pot_history).T)
-ax_pot_late.plot(np.asarray(pot_history[int(n_steps/(2*n_skip)):]).T)
+ax_pot_late.plot(np.asarray(pot_history[int(n_steps/(1.2*n_skip)):]).T)
 
 print(time.time() - start)
 
