@@ -6,7 +6,7 @@ import system
 import numpy.testing as npt
 import copy
 import warnings
-
+import pbc
 
 def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
@@ -16,7 +16,7 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist):
     trial_step = width * np.random.randn(*np.asarray(box_trial.positions).shape)/4 #randn -> std norm. dist, divide by 4 to keep results mostly within (-0.5, 0.5)
 
     for i, particle in enumerate(box_trial.particles):
-        box_trial.particles[i].position = system.enforce_pbc(box_trial.particles[i].position + trial_step[i], box_trial.size) 
+        box_trial.particles[i].position = pbc.enforce_pbc(box_trial.particles[i].position + trial_step[i], box_trial.size) 
         # print(box_trial.particles[0].position)
 
     box_trial.make_positions_list()

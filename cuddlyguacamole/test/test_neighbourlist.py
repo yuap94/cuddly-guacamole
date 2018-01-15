@@ -3,6 +3,7 @@ import numpy.testing as npt
 import neighbourlist
 import system    
 import matplotlib.pyplot as plt
+import pbc
 
 
 def test_verlet_neighbourlist(dim):
@@ -22,20 +23,20 @@ def test_verlet_neighbourlist(dim):
 
     boxsize = np.ones(dim)*np.maximum(sigma_argon, sigma_xenon)*20 # Å
 
-    # pos1 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos2 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos3 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos4 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos5 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos6 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos1 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos2 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos3 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos4 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos5 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos6 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
 
 
-    pos1 = system.enforce_pbc(np.random.randn(dim), boxsize)
-    pos2 = system.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
-    pos3 = system.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
-    pos4 = system.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
-    pos5 = system.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
-    pos6 = system.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
+    pos1 = pbc.enforce_pbc(np.random.randn(dim), boxsize)
+    pos2 = pbc.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
+    pos3 = pbc.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
+    pos4 = pbc.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
+    pos5 = pbc.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
+    pos6 = pbc.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
 
 
     argon_1 = system.Particle(position = pos1, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
@@ -106,12 +107,12 @@ def plot_neighbourlist():
 
     boxsize = np.ones(2)*np.maximum(sigma_argon, sigma_xenon)*20 # Å
 
-    pos1 = system.enforce_pbc(np.random.randn(2), boxsize)
-    pos2 = system.enforce_pbc(pos1 + r_c * np.random.randn(2), boxsize)
-    pos3 = system.enforce_pbc(pos2 + r_c * np.random.randn(2), boxsize)
-    pos4 = system.enforce_pbc(pos3 + r_c * np.random.randn(2), boxsize)
-    pos5 = system.enforce_pbc(pos4 + r_c * np.random.randn(2), boxsize)
-    pos6 = system.enforce_pbc(pos5 + r_c * np.random.randn(2), boxsize)
+    pos1 = pbc.enforce_pbc(np.random.randn(2), boxsize)
+    pos2 = pbc.enforce_pbc(pos1 + r_c * np.random.randn(2), boxsize)
+    pos3 = pbc.enforce_pbc(pos2 + r_c * np.random.randn(2), boxsize)
+    pos4 = pbc.enforce_pbc(pos3 + r_c * np.random.randn(2), boxsize)
+    pos5 = pbc.enforce_pbc(pos4 + r_c * np.random.randn(2), boxsize)
+    pos6 = pbc.enforce_pbc(pos5 + r_c * np.random.randn(2), boxsize)
 
     argon_1 = system.Particle(position = pos1, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
     argon_2 = system.Particle(position = pos2, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)

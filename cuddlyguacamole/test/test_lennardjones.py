@@ -2,6 +2,8 @@ import numpy as np
 import numpy.testing as npt
 import lennardjones
 import system
+import pbc
+
 
 def test_LJ_potential_ij(dim):
 
@@ -42,20 +44,20 @@ def test_LJ_potential(dim):
     width = r_c / (n_skip*10)
     r_s = 2*n_skip*width
 
-    # pos1 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos2 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos3 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos4 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos5 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
-    # pos6 = system.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos1 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos2 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos3 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos4 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos5 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
+    # pos6 = pbc.enforce_pbc(np.random.randn(dim)/4, boxsize)
 
 
-    pos1 = system.enforce_pbc(np.random.randn(dim), boxsize)
-    pos2 = system.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
-    pos3 = system.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
-    pos4 = system.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
-    pos5 = system.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
-    pos6 = system.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
+    pos1 = pbc.enforce_pbc(np.random.randn(dim), boxsize)
+    pos2 = pbc.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
+    pos3 = pbc.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
+    pos4 = pbc.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
+    pos5 = pbc.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
+    pos6 = pbc.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
 
 
     argon_1 = system.Particle(position = pos1, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)

@@ -1,6 +1,6 @@
 import csv
 import numpy as np
-import system
+import pbc
 
 
 def gen_random_input_3D(filename, n_particles, boxsize, r_c):
@@ -10,9 +10,9 @@ def gen_random_input_3D(filename, n_particles, boxsize, r_c):
 
     sysconfig = np.zeros((n_particles,4)) # generate 3d particle position vectors and particle charge
     sysconfig.T[3] = np.random.randn(1, n_particles) # the charge
-    sysconfig[0][0:3] = system.enforce_pbc(np.random.randn(3) * boxsize / 4, boxsize) # position of particle0
+    sysconfig[0][0:3] = pbc.enforce_pbc(np.random.randn(3) * boxsize / 4, boxsize) # position of particle0
     for i in range(1,len(sysconfig)):
-        sysconfig[i][0:3] = system.enforce_pbc(sysconfig[i-1][0:3] + np.random.randn(3) * r_c / (n_particles*8), boxsize) # perturb position of particle0 to get initial pos of particle1
+        sysconfig[i][0:3] = pbc.enforce_pbc(sysconfig[i-1][0:3] + np.random.randn(3) * r_c / (n_particles*8), boxsize) # perturb position of particle0 to get initial pos of particle1
     sysconfig = sysconfig.tolist()
 
     # print(sysconfig)

@@ -6,6 +6,7 @@ import test.generate_test_system
 import lennardjones
 import copy
 import warnings
+import pbc
 
 def test_mcmc_step(dim, update_nblist):
 
@@ -24,12 +25,12 @@ def test_mcmc_step(dim, update_nblist):
     width = r_c / (n_skip*10)
     r_s = 2*n_skip*width
 
-    pos1 = system.enforce_pbc(np.random.randn(dim), boxsize)
-    pos2 = system.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
-    pos3 = system.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
-    pos4 = system.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
-    pos5 = system.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
-    pos6 = system.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
+    pos1 = pbc.enforce_pbc(np.random.randn(dim), boxsize)
+    pos2 = pbc.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
+    pos3 = pbc.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
+    pos4 = pbc.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
+    pos5 = pbc.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
+    pos6 = pbc.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
 
     argon_1 = system.Particle(position = pos1, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
     argon_2 = system.Particle(position = pos2, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
@@ -51,7 +52,7 @@ def test_mcmc_step(dim, update_nblist):
     ourbox_post_mcmc_step, trial_step, _ = metropolis.mcmc_step(ourbox, width, r_c, r_s, update_nblist)
 
     for i, particle in enumerate(ourbox_trial.particles):
-        ourbox_trial.particles[i].position = system.enforce_pbc(ourbox_trial.particles[i].position + trial_step[i], ourbox_trial.size)
+        ourbox_trial.particles[i].position = pbc.enforce_pbc(ourbox_trial.particles[i].position + trial_step[i], ourbox_trial.size)
 
     ourbox_trial.make_positions_list()
     ourbox_trial.compute_LJ_potential(r_c, r_s)
@@ -86,12 +87,12 @@ def test_mcmc(dim, n_steps, n_skip, n_reuse_nblist):
     width = r_c / (n_skip*10)
     r_s = 2*n_skip*width
 
-    pos1 = system.enforce_pbc(np.random.randn(dim), boxsize)
-    pos2 = system.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
-    pos3 = system.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
-    pos4 = system.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
-    pos5 = system.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
-    pos6 = system.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
+    pos1 = pbc.enforce_pbc(np.random.randn(dim), boxsize)
+    pos2 = pbc.enforce_pbc(pos1 + r_c * np.random.randn(dim), boxsize)
+    pos3 = pbc.enforce_pbc(pos2 + r_c * np.random.randn(dim), boxsize)
+    pos4 = pbc.enforce_pbc(pos3 + r_c * np.random.randn(dim), boxsize)
+    pos5 = pbc.enforce_pbc(pos4 + r_c * np.random.randn(dim), boxsize)
+    pos6 = pbc.enforce_pbc(pos5 + r_c * np.random.randn(dim), boxsize)
 
     argon_1 = system.Particle(position = pos1, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
     argon_2 = system.Particle(position = pos2, charge = 0, sigmaLJ = sigma_argon, epsilonLJ = epsilon_argon)
