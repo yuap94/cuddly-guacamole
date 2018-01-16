@@ -32,6 +32,8 @@ def mcmc_step(box, width, r_cut, r_skin, update_nblist):
     #     print("acceptance prob. = " + repr(acceptance_prob))
 
     # print(acceptance_prob)
+    print(box_trial.positions[0])
+    print(box.positions[0])
     if np.random.rand() < acceptance_prob:
         return box_trial, trial_step, acceptance_prob # return trial_step and acceptance_prob to use in unit testing
     return box, trial_step, acceptance_prob
@@ -64,6 +66,7 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist,
     p_acc_vec = []
     for i in range(int(np.ceil(n_steps/n_skip))):
         for j in range(n_skip):
+            # print(i*n_skip+j)
             # box_old = copy.deepcopy(box)
             if np.mod(i*n_skip+j, n_reuse_nblist+1) == 0:
                 box, _, p_acc = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, True) # mcmc acceptance prob p_acc used in testing

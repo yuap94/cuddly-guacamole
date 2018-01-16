@@ -91,7 +91,7 @@ class Box(object):
 
     def simulate(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
         new_box, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
-        self = copy.deepcopy(new_box) # fix metropolis.mcmc to return just updated positions instead? <- would require changing LJ functions too...
+        self = copy.deepcopy(new_box) # fix metropolis.mcmc to return just updated positions instead? <- requires changing LJ functions too
 
     def optimize(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co, r_skin_Co):
         print("code goes here")
