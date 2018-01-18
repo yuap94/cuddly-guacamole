@@ -52,7 +52,7 @@ class Box(object):
         r_skin_LJ (float): size of skin region for LJ potential calculation 
     """
 
-    def __init__(self, dimension, size, particles, temp):
+    def __init__(self, dimension, size, particles, temp, optimisation_pos_history=[], optimisation_pot_history = []):
         """Return a Box object of dimension *dimension* (between 1 and 3),
         whose length(&breadth&height) is *size*, is centered at *center*, 
         and contains the particles in the numpy array *particles*"""
@@ -66,6 +66,8 @@ class Box(object):
         self.Cpotential = None
         self.pos_history = None
         self.pot_history = None
+        self.optimisation_pos_history = optimisation_pos_history # variable to keep all position histories throughout the optimisation
+        self.optimisation_pot_history = optimisation_pot_history
 
         for particle in particles:
             particle.position = pbc.enforce_pbc(particle.position, size)
@@ -75,39 +77,54 @@ class Box(object):
         self.particles = neighbourlist.verlet_neighbourlist(self.particles, r_cut, r_skin)
 
     def compute_LJ_potential(self, r_cut, r_skin):
-        self.LJpotential = lennardjones.LJ_potential(self, r_cut, r_skin)
+        self.LJpotential = lennardjones.LJ_potential(self.particles, r_cut, r_skin)
 
-    def make_positions_list(self):
-        self.positions = [] # update list of positions for each particle
+    def make_positions_list(self): # update positions list based on position registered to each particle in particles
+        self.positions = [] 
         for particle in self.particles:
             self.positions.append(particle.position)
 
+    def update_particle_positions(self): # update registered position for each particle based on positions list
+        for i in range(len(self.particles)):
+            self.particles[i].position = self.positions[i]
 
     def compute_energy(self, r_cutLJ, r_skinLJ, r_cutCo, r_skinCo):
         self.compute_LJ_potential(r_cutLJ, r_skinLJ)
+        self.compute_Coloumb_potential(r_cutCo, r_skinCo)
 
     def compute_Coloumb_potential(self, r_cutCo, r_rkin_Co):
         self.Cpotential = 0
 
     def simulate(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
-        new_box, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
-        self = copy.deepcopy(new_box) # fix metropolis.mcmc to return just updated positions instead? <- would require changing LJ functions too...
+        self.positions, self.LJpotential, self.pos_history, self.pot_history, _ = metropolis.mcmc(self, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+        self.update_particle_positions()
+        self.compute_LJneighbourlist(r_cut_LJ, r_skin_LJ)
 
-    def optimize(self, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co, r_skin_Co):
-        print("code goes here")
+    def optimize(self, n_opt, tol_opt, n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ, r_cut_Co = 0, r_skin_Co = 0):
+        original_temp = self.temp # store original box temperature
 
+        temp_decrease_factors = 1.0/(np.ones(n_opt)*range(1, n_opt+1)) # reduce temperature on each simulation i by temp_decrease_factors[i]
+        temperatures = self.temp * np.ones(n_opt) * temp_decrease_factors
+        
+        i=0
+        # positions_tmp = [np.ones(self.dimension) for x in range(len(self.positions))]
+        # positions_tmp[0] = 1e15*np.ones(self.dimension) # give positions_tmp[0] some large arbitrary value to pass the first while check
+        # while np.linalg.norm(np.asarray(self.positions) - np.asarray(positions_tmp)) > tol_opt and i < n_opt:
+        LJpotential_old = 1e16
+        while np.abs((self.LJpotential - LJpotential_old)/self.LJpotential) > tol_opt and i < n_opt:
+            # positions_tmp = self.positions
+            LJpotential_old = self.LJpotential
+            self.temp = temperatures[i]
+            self.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
+            
+            print(np.abs((self.LJpotential - LJpotential_old)/self.LJpotential))
+            i += 1
+            self.optimisation_pos_history.append(list(self.pos_history)) # store all position histories
+            self.optimisation_pot_history.append(list(self.pot_history))
 
-#############################################################################
+        self.temp = original_temp # reset temperature
+        
+        
 
-
-# # Implementation of periodic boundary conditions:
-
-# def enforce_pbc(r_vec, boxsize):
-#     for i, length in enumerate(boxsize):
-#         while r_vec[i] >= 0.5 * length:
-#             r_vec[i] -= length
-#         while r_vec[i] < -0.5 * length:
-#             r_vec[i] += length
-#     return r_vec
 
 

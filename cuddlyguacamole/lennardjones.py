@@ -15,7 +15,7 @@ def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
            - 4.0 * epsilonij * q_c *(q_c - 1.0)) # subtract value of potential at r_cut to avoid discontinuity # precompute!!!!!!
 
 
-def LJ_potential(box, r_c, r_s):    
+def LJ_potential(particles, r_c, r_s):    
     '''Computes the total Lennard Jones potential of the system configuration of *box*.
     
     arguments:
@@ -25,11 +25,11 @@ def LJ_potential(box, r_c, r_s):
         r_s (float): size of skin region for LJ potential
     '''
 
-    if box.particles[0].neighbourlist is None:
-        box.compute_LJneighbourlist(r_c, r_s)
+    if particles[0].neighbourlist is None:
+        raise Exception('compute neighbourlists for particles before computing LJ potential!')
 
     LJpot = 0.0
-    for particlei in box.particles:
+    for particlei in particles:
         for particlej in particlei.neighbourlist:
             r = np.linalg.norm(particlei.position - particlej.position)
             LJpot += LJ_potential_ij(r, particlei.sigmaLJ, particlei.epsilonLJ, 

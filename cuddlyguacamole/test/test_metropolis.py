@@ -49,7 +49,15 @@ def test_mcmc_step(dim, update_nblist):
 
     ourbox_trial = copy.deepcopy(ourbox)
 
-    ourbox_post_mcmc_step, trial_step, _ = metropolis.mcmc_step(ourbox, width, r_c, r_s, update_nblist)
+    ourbox_post_mcmc_step = system.Box(dimension = dim, size = boxsize, particles = particles, temp = temp)
+    ourbox_post_mcmc_step.compute_LJneighbourlist(r_c, r_s)
+    ourbox_post_mcmc_step.compute_LJ_potential(r_c, r_s)
+    ourbox_post_mcmc_step.make_positions_list()
+
+    ourbox_post_mcmc_step.positions, ourbox_post_mcmc_step.LJpotential, trial_step, _ = metropolis.mcmc_step(ourbox, width, r_c, r_s, update_nblist)
+    ourbox_post_mcmc_step.update_particle_positions()
+    ourbox_post_mcmc_step.compute_LJneighbourlist(r_c, r_s)
+
 
     for i, particle in enumerate(ourbox_trial.particles):
         ourbox_trial.particles[i].position = pbc.enforce_pbc(ourbox_trial.particles[i].position + trial_step[i], ourbox_trial.size)
@@ -109,8 +117,10 @@ def test_mcmc(dim, n_steps, n_skip, n_reuse_nblist):
     ourbox.compute_LJ_potential(r_c, r_s)
     ourbox.make_positions_list()
 
-    ourbox_post_mcmc, positions_history, potLJ_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, True, r_c, r_s)
-   
+    ourbox.positions, ourbox.LJpotential, positions_history, potLJ_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, True, r_c, r_s)
+    ourbox.update_particle_positions()
+    ourbox.compute_LJneighbourlist(r_c, r_s)
+
     for positions in positions_history:
         temp_box = system.Box(dimension = dim, size = boxsize, particles = particles, temp = temp)
         for i in range(len(positions_history)):
