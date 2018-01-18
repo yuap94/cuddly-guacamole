@@ -1,6 +1,8 @@
 import numpy as np
 import system
+import numba as nb
 
+@nb.jit
 def verlet_neighbourlist(particles, r_cut, r_skin):
     """Verlet neighbourlist computation: for each of the particles in the array *box.particles*,
     we compute a neighbourlist of particles that lie within a cutoff radius r_cut+r_skin. 

@@ -1,7 +1,9 @@
 import numpy as np
 import neighbourlist
 import system
+import numba as nb
 
+@nb.jit(nopython = True)
 def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
     
     sigmaij = 0.5 * (sigmaii + sigmajj) # Lorentz-Berthelot: https://en.wikipedia.org/wiki/Combining_rules
@@ -15,6 +17,7 @@ def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
            - 4.0 * epsilonij * q_c *(q_c - 1.0)) # subtract value of potential at r_cut to avoid discontinuity # precompute!!!!!!
 
 
+@nb.jit
 def LJ_potential(particles, r_c, r_s):    
     '''Computes the total Lennard Jones potential of the system configuration of *box*.
     
