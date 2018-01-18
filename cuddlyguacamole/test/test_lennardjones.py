@@ -103,7 +103,7 @@ def test_LJ_potential(dim):
             LJ_pot_ref += lennardjones.LJ_potential_ij(r, sigma_xenon, epsilon_xenon, 
                             particlej.sigmaLJ, particlej.epsilonLJ, r_c, r_s)
 
-
+    ourbox.compute_LJneighbourlist(r_c, r_s)
     ourbox.compute_LJ_potential(r_c, r_s)
     # npt.assert_almost_equal(LJ_pot_ref, ourbox.LJpotential)
     npt.assert_allclose(LJ_pot_ref, ourbox.LJpotential, rtol=1e-12)

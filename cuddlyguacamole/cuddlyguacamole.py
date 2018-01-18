@@ -17,7 +17,7 @@ start = time.time()
 # System and simulation setup:
 ############################################################################################################
 
-# kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
+kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
 # xenon & argon: http://pbx-brasil.com/outrasDisciplinas/DinMol/Notas/IIarea/aula203/papers/PhysRev.159.98.pdf
 sigma_argon = 3.405 # Å
 epsilon_argon = 119.8 # actually epsilon/kb (K) <- thus potential is actually potential/kb
@@ -25,22 +25,22 @@ epsilon_argon = 119.8 # actually epsilon/kb (K) <- thus potential is actually po
 # epsilon_xenon = 225.3 # actually epsilon/kb (K) <- thus potential is actually potential/kb
 
 dim = 3 # spatial dimension of system
-boxsize = np.ones(dim)*sigma_argon*10 # size of our system box
 
 r_cut_LJ = 2.5*sigma_argon # cut-off radius for LJ potential computation
-n_steps = 1000 # no. of steps to simulate
+n_steps = 600 # no. of steps to simulate
 n_reuse_nblist = int(n_steps/50) # update the neighbourlist for each particle only every n_reuse_nblist steps
 n_skip = int(n_steps/200) # only save the system history every n_skip steps
 width = r_cut_LJ / (n_reuse_nblist*20)
 r_skin_LJ = 2*n_reuse_nblist*width # skin region for LJ potential computation
 
+boxsize = np.ones(dim)*(r_cut_LJ + r_skin_LJ)*1.2 # size of our system box
 
 ############################################################################################################
 # Generate input system configuration:
 ############################################################################################################
 
 
-input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 20, 
+input.inputgenerator.gen_random_input_3D(filename = "input/testinput.csv", n_particles = 30, 
                                             boxsize = boxsize, r_c = r_cut_LJ + r_skin_LJ)
 
 sysconfig = []
@@ -73,12 +73,13 @@ ourbox.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
 ############################################################################################################
 
 save_system_history = True
-# ourbox, pos_history, pot_history, p_acc_vec = metropolis.mcmc(ourbox, n_steps, width, n_skip, n_reuse_nblist, save_system_history, r_cut_LJ, r_skin_LJ)
+n_opt = 50
+# tol_opt = ourbox.size[0]/100
+tol_opt = 1/50
+ourbox.optimize(n_opt, tol_opt, 5*int(n_steps/n_opt), n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
 ourbox.simulate(n_steps, n_reuse_nblist, n_skip, width, save_system_history, r_cut_LJ, r_skin_LJ)
-
-# print(ourbox.LJpotential)
 pos_history = ourbox.pos_history
-pot_history = ourbox.pot_history
+pot_history = kb*10**10*np.asarray(ourbox.pot_history) #kb*10**10 to get potential in Joule
 pot_increases = 0
 pot_decreases = 0
 for i, pot in enumerate(pot_history[1:]):
@@ -95,13 +96,21 @@ for i, pot in enumerate(pot_history[1:]):
 # print(pot_increases)
 # print(pot_decreases)
 
+entire_pot_history = []
+for pot_history_opt_round_i in ourbox.optimisation_pot_history:
+    for pot_step_j_opt_round_i in pot_history_opt_round_i[0:-1]:
+        entire_pot_history.append(kb*10**10*pot_step_j_opt_round_i)
+
+entire_pot_history = np.asarray(entire_pot_history)
+
 ############################################################################################################
 # Plotting:
 ############################################################################################################
 
 xyz = np.zeros((len(pos_history),3))
 xy = np.zeros((len(pos_history), 2))
-for i,pos_i in enumerate(pos_history):
+xyz_final = np.asarray(pos_history[-1])
+for i, pos_i in enumerate(pos_history):
      xyz[i] = np.asarray(pos_i[0])
      xy[i] = np.asarray(pos_i[0][0:2])
 xyz = np.asarray(xyz)
@@ -109,19 +118,25 @@ xy = np.asarray(xy)
 
 fig = plt.figure()
 
-ax_xyz = fig.add_subplot(221, projection='3d')
-ax_xy = fig.add_subplot(222)
+ax_xyz = fig.add_subplot(231, projection='3d') # movement of 0th particle
+# ax_xy = fig.add_subplot(222) # movement of 0th particle projected to xy-plane 
+ax_xyz_final = fig.add_subplot(232, projection='3d') # plot of system configuration
 
 ax_xyz.plot(*xyz.T, "--", color = "grey") 
-ax_xyz.scatter(*xyz.T, c = pot_history)
-ax_xy.plot(*xy.T, "--", color = "grey") 
-ax_xy.scatter(*xy.T, c = pot_history)
+ax_xyz.scatter(*xyz.T, c = range(len(xyz))) # color shows whether point is from early or late in simulation
+# ax_xy.plot(*xy.T, "--", color = "grey") 
+# ax_xy.scatter(*xy.T, c = pot_history)
+ax_xyz_final.scatter(*xyz_final.T)
 
-ax_pot = fig.add_subplot(223)
-ax_pot_late = fig.add_subplot(224)
+ax_pot = fig.add_subplot(233)
+ax_pot_late = fig.add_subplot(234)
 
 ax_pot.plot(np.asarray(pot_history).T)
 ax_pot_late.plot(np.asarray(pot_history[int(n_steps/(1.2*n_skip)):]).T)
+
+ax_pot_full = fig.add_subplot(235)
+ax_pot_full.plot(np.asarray(entire_pot_history).T)
+
 
 print(time.time() - start)
 
