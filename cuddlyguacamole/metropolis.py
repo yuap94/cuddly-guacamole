@@ -68,7 +68,7 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist,
         box.compute_LJ_potential(r_cut_LJ, r_skin_LJ)
     potLJ_history = [box.LJpotential]  
 
-    p_acc_vec = []
+    p_acc_vec = [] # testing thing...
     for i in range(int(np.ceil(n_steps/n_skip))):
         for j in range(n_skip):
             update_nblist = (np.mod(i*n_skip+j, n_reuse_nblist+1) == 0)
