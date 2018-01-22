@@ -7,7 +7,9 @@ import numpy.testing as npt
 import copy
 import warnings
 import pbc
+import numba as nb
 
+# @nb.jit(nb.typeof([np.zeros(1)], True, np.random.randn(1), 1.0))
 def mcmc_step(box, width, r_cut, r_skin, update_nblist):
 
     # kb = 1.38064852*10**(-13) # N*Å/K (Boltzmann constant)
@@ -73,6 +75,7 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist,
         for j in range(n_skip):
             update_nblist = (np.mod(i*n_skip+j, n_reuse_nblist+1) == 0)
             positions_new, accepted, _, p_acc = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, update_nblist) # mcmc acceptance prob p_acc used in testing
+            # positions_new, accepted = mcmc_step(box, width, r_cut_LJ, r_skin_LJ, update_nblist) # mcmc acceptance prob p_acc used in testing
             
             if accepted:
                 box.positions = positions_new
@@ -87,7 +90,7 @@ def mcmc(box, n_steps, width, n_skip, n_reuse_nblist,
             positions_history.append(box.positions)
             potLJ_history.append(box.LJpotential)
             p_acc_vec.append(p_acc)
-        # print(i*n_skip+n_skip)
+        print(i*n_skip+n_skip)
 
     return box.positions, box.LJpotential, positions_history, potLJ_history, p_acc_vec # return history and p_acc_vec for use in testing
 
