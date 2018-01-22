@@ -18,7 +18,8 @@ def LJ_potential_ij(r, sigmaii, epsilonii, sigmajj, epsilonjj, r_c, r_s):
 
 
 @nb.jit
-def LJ_potential(particles, r_c, r_s):    
+def LJ_potential(particles, r_c, r_s):
+def LJ_potential(positions, neighbourlists, sigmas, epsilons, r_c, r_s):    
     '''Computes the total Lennard Jones potential of the system configuration of *box*.
     
     arguments:
