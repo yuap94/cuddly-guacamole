@@ -11,23 +11,18 @@ from scipy import exp, pi
 
 
 
-def energy(position,  q, cell, alpha=5, cutoff_real, cutoff_k):
+def energy(position,  q, cell, .......):
     """
     Arguments:
     position : potential location
-    q : list of charges
-    cutoff_rspace : real space box cutoff
-    cutoff_kspace : k or Fourier space box cutoff
-    
-    'nmax=rspace
+    q : list of charges........
+
     """
     Energy_short  = short_energy_sum(i, r, q, cell, alpha, cutoff_rspace)
     Energy_long   = long_energy_sum(i, r, q, invcell, alpha, cutoff_kspace, area)
     Energy_self   = self_energy_sum(i, r, q, cell, alpha)
     
     return Energy_short+Energy_long-Engery_self
-
-
 
 
 #energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
