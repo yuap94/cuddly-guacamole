@@ -1,71 +1,75 @@
+#Mathematical derivation. with reference to  http://micro.stanford.edu/mediawiki/images/4/46/Ewald_notes.pdf 
+
 import numpy as np
 import neighbourlist
 import system
-
-from numpy import dot, sqrt
 from numpy.linalg import norm
 from scipy.special import erfc
 from scipy import exp, pi
 
 
-def energy():
-    pass
 
 
-def potential(i, r, q, cell, area, invcell, alpha=5, nmax=3, mmax=9):
+
+def energy(position,  q, cell, alpha=5, cutoff_real, cutoff_k):
     """
-    i : potential location
-    r : list of radii
+    Arguments:
+    position : potential location
     q : list of charges
-    alpha : Ewald parameter
-    nmax : real space box cutoff
-    mmax : Fourier space box cutoff
+    cutoff_rspace : real space box cutoff
+    cutoff_kspace : k or Fourier space box cutoff
+    
+    'nmax=rspace
     """
-    Vr = potential_realsum(i, r, q, cell, alpha, nmax)
-    Vf = potential_recipsum(i, r, q, invcell, alpha, mmax, area)
-    Vs = potential_selfsum(i, r, q, cell, alpha)
-    return Vr+Vf+Vs
+    Energy_short  = short_energy_sum(i, r, q, cell, alpha, cutoff_rspace)
+    Energy_long   = long_energy_sum(i, r, q, invcell, alpha, cutoff_kspace, area)
+    Energy_self   = self_energy_sum(i, r, q, cell, alpha)
+    
+    return Energy_short+Energy_long-Engery_self
 
 
-def potential_realsum(i, r, q, cell, alpha, nmax):
-    Vr = 0
+
+
+#energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
+def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
+    
     for j in range(0, len(q)):
         rij = r[i, :] - r[j, :]
-        Vrloc = 0
-        for n2 in range(-nmax, nmax+1):
-            for n1 in range(-nmax, nmax+1):
-                for n0 in range(-nmax, nmax+1):
-                    if max([abs(n0), abs(n1), abs(n2)]):
-                        n = n0*cell[0, :]+n1*cell[1, :]+n2*cell[2, :]
-                        rn = norm(rij - n)
-                        Vrloc += erfc(alpha*rn)/rn
-        Vr += q[j]*Vrloc
+   
+        
+        
     return Vr
 
 
-def potential_recipsum(i, r, q, cell, alpha, mmax, area):
-    Vf = 0
+def long_energy_sum(i, r, q, cell, alpha, cutoff_kspace, area):
+    long_energy_sum = 0
     for j in range(0, len(q)):
         rij = r[i, :] - r[j, :]
-        Vfloc = 0
-        for n2 in range(-mmax, mmax+1):
-            for n1 in range(-mmax, mmax+1):
-                for n0 in range(-mmax, mmax+1):
-                    if max([abs(n0), abs(n1), abs(n2)]):
-                        m = 2*pi*(n0*cell[0, :]+n1*cell[1, :]+n2*cell[2, :])
-                        Vfloc += exp(1.j * dot(m, rij) - dot(m, m) /
-                                     (alpha**2 * 4))/(dot(m, m)/(4*pi**2))
+       
+   
+            
+    long_pre = 1/(2*V*epsilon_0)     #prefactor of the long-ranged term         
+    k                                #???reciprocal vector need to be defined 
+    k2 = k**2 
+    sigma2 = sigma** 2 
+    s_k = sum( q*np.exp(k*r)         #structure factor 
+    s_k2= s_k**2                     #sqaure of structure factor    
 
-        Vf += q[j]/(pi*area) * Vfloc.real
-    return Vf
+    midpart = np.sum(exp(-sigma2*k2/2)/k2) 
+     
+        long_energy_sum = long_pre*midpart*s_k2
+    return long_energy_sum
 
 
-def potential_selfsum(i, r, q, cell, alpha):
-    Vs = 0
+def self_energy_sum(i, r, q, cell, alpha):
+   
     for j in range(0, len(q)):
         if i == j:
-            Vs -= 2*q[j]*alpha/sqrt(pi)
-        else:
-            rn = norm(r[i, :] - r[j, :])
-            Vs += q[j]*erfc(alpha*rn)/rn
-    return Vs
+            
+                 
+    self_pre = 1/(4*pi*eplison_0*sigma*np.sqrt(2*np.pi))     #prefactor of the self-term
+    q2 = q** 2                                                  #???particle charge to be defined 
+              
+        self_energy_sum = self_pre*np.sum(q2) 
+         
+    return self_energy_sum 
