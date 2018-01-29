@@ -25,6 +25,10 @@ def energy(position,  q, cell, .......):
     return Energy_short+Energy_long-Engery_self
 
 
+
+def self_potential ##
+
+
 #energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
 def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
     
@@ -36,8 +40,9 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
     return Vr
 
 
-def long_energy_sum(i, r, q, cell, alpha, cutoff_kspace, area):
-    long_energy_sum = 0
+def long_e (i, r, q, cell, alpha, cutoff_kspace, area):
+    long_e = 0
+    
     for j in range(0, len(q)):
         rij = r[i, :] - r[j, :]
        
@@ -56,15 +61,14 @@ def long_energy_sum(i, r, q, cell, alpha, cutoff_kspace, area):
     return long_energy_sum
 
 
-def self_energy_sum(i, r, q, cell, alpha):
-   
-    for j in range(0, len(q)):
-        if i == j:
-            
-                 
+def total_self_energy(i, r, q, cell, alpha):                 #general algo. done 
+    self_energy = 0 
+    self_potential_sum = 0 
     self_pre = 1/(4*pi*eplison_0*sigma*np.sqrt(2*np.pi))     #prefactor of the self-term
-    q2 = q** 2                                                  #???particle charge to be defined 
               
-        self_energy_sum = self_pre*np.sum(q2) 
+    for i in range(0, len(q)):                               # !! particle code to be corrected to system.  
+        self_potential_sum += self_potential(i)              # !! def self_potential 
+      
+    total_self_energy = self_pre*self_potential_sum 
          
-    return self_energy_sum 
+    return total_self_energy
