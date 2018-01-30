@@ -9,15 +9,10 @@ from scipy import exp, pi
 
 
 def energy(position,  q, cell, .......):
-    """
-    Arguments:
-    position : potential location
-    q : list of charges........
 
-    """
-    Energy_short  = short_energy_sum(i, r, q, cell, alpha, cutoff_rspace)
-    Energy_long   = long_energy_sum(i, r, q, invcell, alpha, cutoff_kspace, area)
-    Energy_self   = self_energy_sum(i, r, q, cell, alpha)
+    Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)
+    Energy_long   = long_energy(i, r, q, cutoff_kspace,)
+    Energy_self   = self_energy(i, r, q, cell)
     
     return Energy_short+Energy_long-Engery_self
 
@@ -25,8 +20,6 @@ def energy(position,  q, cell, .......):
 
 
 def self_potential ##
-
-def 
 
 #energy calculation formula. with reference to equation 39 in page 7 of the pdf(link found in first line of this file). 
 def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
@@ -39,12 +32,10 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
     return Vr
 
 
-def total_long_energy (i, r, q, cell, alpha, cutoff_kspace):
+def total_long_energy (i, r, q, cutoff_kspace):
     long_e = 0
     
     for j in range(0, len(q)):
-        rij = r[i, :] - r[j, :]
-
             
     long_pre = 1/(2*V*epsilon_0)     #prefactor of the long-ranged term         
     k                                #????reciprocal vector need to be defined 
@@ -71,8 +62,7 @@ def total_s_energy(self):                                 #general algo. done
          
     return total_s_energy
 
-
-def kspace (self) :
+def str_fac (self) :
     s_k=0 
     for i in range ():
         s_k += charge(i)*exp(k*position(i))
