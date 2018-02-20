@@ -33,14 +33,15 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
 
 
 def k_energy (i, r, q, cutoff_kspace):
+    #prefactor        
+    pre_fac = 1/(2*V*epsilon_0)  
     
     result = np.zeros (n) 
     
     for i in range 
 
     
-    #prefactor        
-    pre_fac = 1/(2*V*epsilon_0)  
+    
     
     #Reciprocal vector 
     k = 2.0*np.pi*np.array(, , )                               
