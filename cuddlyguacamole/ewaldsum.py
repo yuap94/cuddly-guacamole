@@ -53,11 +53,11 @@ def k_energy (i, r, q, cutoff_kspace):
     s_k = sum( q*np.exp(k*r))          
     s_k2= s_k**2              
 
-    midpart = np.sum(exp(-sigma2*k2/2)/k2) 
+    e_part = np.sum(exp(-sigma2*k2/2)/k2) 
      
-        total_long_energy = long_pre*midpart*s_k2
+        l_r_e = pre_fac*s_k2*e_part
         
-    return total_long_energy
+    return l_r_e
 
 def str_fac (self) :
     s_k=0 
