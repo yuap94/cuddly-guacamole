@@ -10,7 +10,7 @@ from scipy import exp, pi
 
 def energy(position,  q, cell, .......):
 
-    Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)
+    Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)m
     Energy_long   = long_energy(i, r, q, cutoff_kspace,)
     Energy_self   = self_energy(i, r, q, cell)
     
@@ -32,28 +32,60 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
     return Vr
 
 
-def total_long_energy (i, r, q, cutoff_kspace):
-    long_e = 0
+def k_energy (i, r, q, cutoff_kspace):
     
-    for j in range(0, len(q)):
-            
-    long_pre = 1/(2*V*epsilon_0)     #prefactor of the long-ranged term         
-    k                                #????reciprocal vector need to be defined 
+    result = np.zeros (n) 
+    
+    for i in range 
+
+    
+    #prefactor        
+    pre_fac = 1/(2*V*epsilon_0)  
+    
+    #Reciprocal vector 
+    k = 2.0*np.pi*np.array(, , )                               
     k2 = k**2 
-    sigma2 = sigma** 2 
-    s_k = sum( q*np.exp(k*r))         #structure factor 
-    s_k2= s_k**2                      #sqaure of structure factor    
+    
+    #Sigma = r_c/ sqrt(2*p)
+    sigma2 = sigma** 2
+    
+    #Structure factor
+    s_k = sum( q*np.exp(k*r))          
+    s_k2= s_k**2              
 
     midpart = np.sum(exp(-sigma2*k2/2)/k2) 
      
         total_long_energy = long_pre*midpart*s_k2
+        
     return total_long_energy
+
+def str_fac (self) :
+    s_k=0 
+    for i in range ():
+        s_k += charge(i)*exp(k*position(i))
+    return s_k 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def total_s_energy(self):                                 #general algo. done 
     s_energy = 0 
     s_total_potential = 0 
-    s_pre = 1/(4*pi*eplison_0*sigma*np.sqrt(2*np.pi))     #prefactor of the self-term
+    s_pre = 1/(4*pi*epsilon_0*sigma*np.sqrt(2*np.pi))     #prefactor of the self-term
               
     for i in range(0, len(q)):                            # ==1  particle code to be corrected to system.  
         total_s_potential += s_potential(i)               # !! def self_potential 
@@ -62,8 +94,4 @@ def total_s_energy(self):                                 #general algo. done
          
     return total_s_energy
 
-def str_fac (self) :
-    s_k=0 
-    for i in range ():
-        s_k += charge(i)*exp(k*position(i))
-    return s_k 
+
