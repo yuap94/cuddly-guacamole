@@ -3,23 +3,26 @@
 
 def k_energy (i, r, q, k_c):
     
+    #prefactor 
+    V=np.prod(box)
+    pre_fac = 1/(2*V*epsilon_0)  
     
-    
-    for k_i in range (-k_c,k_c+1)
-        for k_j in range (-k_c,k_c+1)
-            for k_k in range (-k_c,k_c+1) 
+    for i in range (n):  
+        for j in range (m): 
             
-                #Reciprocal vector 
-                k = 2.0*np.pi*np.array([k_i / (box[0]), k_j / (box[1]), k_k / (box[2])] )                               
-                k_sq = k*k  
+            
+            for k_i in range (-k_c,k_c+1)
+                for k_j in range (-k_c,k_c+1)
+                    for k_k in range (-k_c,k_c+1) 
+                        if np.linalg.norm(k_i,k_j,k_k) <= k_c 
+                        #Reciprocal vector 
+                        k = 2.0*np.pi*np.array([k_i / (box[0]), k_j / (box[1]), k_k / (box[2])] )                               
+                        k_sq = k*k  
     
-                #prefactor, V value ???
-                pre_fac = 1/(2*V*epsilon_0)             
-
-                exp_term += np.exp(-(sigma**2)*k_sq/2)/k_sq) 
+                        exp_term += np.exp(-(sigma**2)*k_sq/2)/k_sq) 
      
-         k_space_energy= pre_fac*(s_k**2)*exp_term
-        
+                k_space_energy= pre_fac*(s_k**2)*exp_term
+    
     return k_space_energy
 
 
