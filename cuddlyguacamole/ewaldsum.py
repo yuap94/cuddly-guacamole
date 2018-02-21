@@ -11,7 +11,7 @@ from scipy import exp, pi
 def energy(position,  q, cell, .......):
 
     Energy_short  = short_energy(i, r, q, cell, cutoff_rspace)m
-    Energy_long   = long_energy(i, r, q, cutoff_kspace,)
+    Energy_long   = long_energy(i, r, q, cutoff_kspace)
     Energy_self   = self_energy(i, r, q, cell)
     
     return Energy_short+Energy_long-Engery_self
@@ -32,20 +32,31 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
     return Vr
 
 
+
+
+
+
 def k_energy (i, r, q, cutoff_kspace):
     #prefactor        
     pre_fac = 1/(2*V*epsilon_0)  
     
     result = np.zeros (n) 
     
+    #accuracy set to 1e-6 gives p 
+    p = ????
+    sigma = r_cut/ (np.sqrt (2*p))
+    k_c = 2*p/r_cut
+    
     for i in range 
-
-    
-    
-    
-    #Reciprocal vector 
-    k = 2.0*np.pi*np.array(, , )                               
-    k2 = k**2 
+       for j in range 
+           
+            for k_i in range (-k_c,k_c+1): 
+                for k_j in range (-k_c,k_c+1): 
+                    for k_k in range (-k_c,k_c+1): 
+                      
+                         #Reciprocal vector 
+                          k = 2.0*np.pi*np.array(, , )                               
+                          k2 = k**2 
     
     #Sigma = r_c/ sqrt(2*p)
     sigma2 = sigma** 2
