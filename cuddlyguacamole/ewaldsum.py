@@ -38,6 +38,8 @@ def short_energy_sum (i, r, q, cell, alpha, cutoff_rspace):
 
 def k_energy (i, r, q, cutoff_kspace):
     
+    
+    
     for k_i in range (-k_c,k_c+1)
         for k_j in range (-k_c,k_c+1)
             for k_k in range (-k_c,k_c+1) 
@@ -45,19 +47,9 @@ def k_energy (i, r, q, cutoff_kspace):
                 k = 2.0*np.pi*np.array([k_i / (box[0]), k_j / (box[1]), k_k / (box[2])] )                               
                 k2 = k*k  
     
-    #prefactor        
+    #prefactor, V value ???
     pre_fac = 1/(2*V*epsilon_0)  
-    
-    #accuracy set to 1e-6 gives p 
-    p = ????
-    sigma = r_cut/ (np.sqrt (2*p))
-    k_c = 2*p/r_cut 
-                      
-    
-    
-    #Sigma = r_c/ sqrt(2*p)
-    sigma2 = sigma** 2
-    
+
     #Structure factor
     
     s_k = sum( q*np.exp(k*r))          
@@ -69,6 +61,18 @@ def k_energy (i, r, q, cutoff_kspace):
         
     return k_space_energy
 
+
+def k_cut_off (self) :
+    #accuracy set to 1e-6 gives p 
+    p = ????
+    k_c = 2*p/r_cut 
+    #Sigma
+    sigma = r_c / np.sqrt (2*p) 
+    sigma2 = sigma*sigma 
+    
+
+                      
+ 
 def str_fac (self) :
     s_k=0 
     for i in range ():
